@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>360&deg; Image Gallery</title>
+    <meta name="description" content="360&deg; Image Gallery - A-Frame">
+    <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@5/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-layout-component@5.3.0/dist/aframe-layout-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-template-component@3.2.1/dist/aframe-template-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-proxy-event-component@2.1.0/dist/aframe-proxy-event-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-look-at-component@0.5.1/dist/aframe-look-at-component.min.js"></script>
+
+    <script>
+      AFRAME.registerComponent('hotspots',{
+        init:function(){
+            this.el.addEventListener('reloadspots',function(evt){
+
+            //get the entire current spot group and scale it to 0
+            var currspotgroup=document.getElementById(evt.detail.currspots);
+            currspotgroup.setAttribute("scale","0 0 0");
+
+            //get the entire new spot group and scale it to 1
+            var newspotgroup=document.getElementById(evt.detail.newspots);
+            newspotgroup.setAttribute("scale","1 1 1");
+          });
+        }
+      });
+      AFRAME.registerComponent('spot',{
+        schema:{
+          linkto:{type:"string",default:""},
+          spotgroup:{type:"string",default:""}
+        },
+        init:function(){
+
+          //add image source of hotspot icon
+          this.el.setAttribute("src","#hotspot");
+          //make the icon look at the camera all the time
+          this.el.setAttribute("look-at","#cam");
+
+          var data=this.data;
+
+          this.el.addEventListener('click',function(){
+            //set the skybox source to the new image as per the spot
+            var sky=document.getElementById("skybox");
+            sky.setAttribute("src",data.linkto);
+
+            var spotcomp=document.getElementById("spots");
+            var currspots=this.parentElement.getAttribute("id");
+            //create event for spots component to change the spots data
+            spotcomp.emit('reloadspots',{newspots:data.spotgroup,currspots:currspots});
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <img id="pic1" src="pic1.jpg" >
+        <img id="pic2" src="pic2.jpg">
+        <img id="pic3" src="pic3.jpg">
+        <img id="pic4" src="pic4.jpg">
+        <img id="pic5" src="pic5.jpg">
+        <img id="pic6" src="pic6.jpg">
+        <img id="pic7" src="pic7.jpg">
+        <img id="pic8" src="pic8.jpg">
+        <img id="pichallway1" src="pichallway1.jpg">
+        <img id="pichallway2" src="pichallway2.jpg">
+        <img id="linktoclassroom" src="linktoclassroom.jpg">
+        <img id="lastpic" src="lastpicinloop.jpg">
+        <img id="classroom" src="jimmoranschool.jpg">
+        <img id="nook1" src="pic_nook.jpg">
+        <img id="nook2" src="nook2.jpg">
+
+
+        <img id="hotspot" src="https://cdn.glitch.com/2087dfa6-bd02-4451-a189-36095a66f386%2Fup-arrow.png?1545397127546"/>
+
+        <!-- Image link template to be reused. -->
+        <script id="link" type="text/html">
+          <a-entity class="link"
+            geometry="primitive: plane; height: 1; width: 1"
+            material="shader: flat; src: ${thumb}"
+            event-set__mouseenter="scale: 1.2 1.2 1"
+            event-set__mouseleave="scale: 1 1 1"
+            event-set__click="_target: #image-360; _delay: 100; material.src: ${src}"
+            proxy-event="event: click; to: #hotspot; as: fade"
+            sound="on: click; src: #image-360"></a-entity>
+            <a-entity>
+        </script>
+
+
+      </a-assets>
+
+
+      <!-- 360-degree image.
+      <a-sky id="image-360" radius="10" src="#pic1"
+             animation__fade="property: components.material.material.color; type: color; from: #FFF; to: #000; dur: 300; startEvents: fade"
+             animation__fadeback="property: components.material.material.color; type: color; from: #000; to: #FFF; dur: 300; startEvents: animationcomplete__fade"></a-sky>
+-->
+
+      <!-- Image links. -->
+      <a-entity id="spots" hotspots>
+            <a-entity id="group-pic1">
+              <a-image spot="linkto:#pic2 ;spotgroup:group-pic2" position="-6 1.6 2"></a-image>
+            </a-entity>
+
+            <a-entity id="group-pic2" scale="0 0 0">
+              <a-image spot="linkto:#pic1;spotgroup:group-pic1" position="-8 1.5 .5"></a-image>
+              <a-image spot="linkto:#pic3;spotgroup:group-pic3" position="2 1.3 8"></a-image>
+              <a-image spot="linkto:#lastpic;spotgroup:group-lastpic" position="-9 1.5 -6.3"></a-image>
+              <a-image spot="linkto:#nook1;spotgroup:group-nook1" position="15 0 4"></a-image>
+            </a-entity>
+
+            <a-entity id="group-nook1" scale="0 0 0">
+              <a-image spot="linkto:#pic2 ;spotgroup:group-pic2" position="-6 1.6 2"></a-image>
+            </a-entity>
+
+
+            <a-entity id="group-pic3" scale="0 0 0">
+              <a-image spot="linkto:#pic2;spotgroup:group-pic2" position="-10 0 -1"></a-image>
+              <a-image spot="linkto:#pic4;spotgroup:group-pic4" position="10 0 -5"></a-image>
+              <a-image spot="linkto:#pic5;spotgroup:group-pic5" position="10 0 0"></a-image>
+            </a-entity>
+
+
+
+
+            <a-entity id="group-pic5" scale="0 0 0">
+              <a-image spot="linkto:#pic3;spotgroup:group-pic3" position="5 0 -10"></a-image>
+              <a-image spot="linkto:#nook2;spotgroup:group-nook2" position="0 0 -10"></a-image>
+              <a-image spot="linkto:#pic6;spotgroup:group-pic6" position="8 0 10"></a-image>
+            </a-entity>
+
+            <a-entity id="group-nook2" scale"0 0 0">
+              <a-image spot="linkto:#pic5;spotgroup:group-pic5"  position="-6 1.6 2"></a-image>
+            </a-entity>
+
+            <a-entity id="group-pic6" scale="0 0 0">
+              <a-image spot="linkto:#pic5;spotgroup:group-pic5" position="-3 0 10"></a-image>
+              <a-image spot="linkto:#pic7;spotgroup:group-pic7" position="12 0 -3"></a-image>
+            </a-entity>
+
+            <a-entity id="group-pic7" scale="0 0 0">
+              <a-image spot="linkto:#pic6;spotgroup:group-pic6" position="-10 0 -1"></a-image>
+              <a-image spot="linkto:#pic8;spotgroup:group-pic8" position="10 0 -1"></a-image>
+            </a-entity>
+
+            <a-entity id="group-pic8" scale="0 0 0">
+              <a-image spot="linkto:#pic7;spotgroup:group-pic7" position="-10 0 -1"></a-image>
+              <a-image spot="linkto:#pichallway1;spotgroup:group-pichallway1" position="10 0 -1"></a-image>
+            </a-entity>
+
+            <a-entity id="group-pichallway1" scale="0 0 0">
+              <a-image spot="linkto:#pic8;spotgroup:group-pic8" position="0 0 -10"></a-image>
+              <a-image spot="linkto:#pichallway2;spotgroup:group-pichallway2" position="0 0 10"></a-image>
+            </a-entity>
+
+            <a-entity id="group-pichallway2" scale="0 0 0">
+              <a-image spot="linkto:#pichallway1;spotgroup:group-pichallway1" position="0 0 -10"></a-image>
+              <a-image spot="linkto:#linktoclassroom;spotgroup:group-linktoclassroom" position="0 0 10"></a-image>
+            </a-entity>
+
+            <a-entity id="group-linktoclassroom" scale="0 0 0">
+              <a-image spot="linkto:#pichallway2;spotgroup:group-pichallway2" position="10 0 -1"></a-image>
+              <a-image spot="linkto:#lastpic;spotgroup:group-lastpic" position="1 0 -12"></a-image>
+              <a-image spot="linkto:#classroom;spotgroup:group-classroom" position="1 0 10"></a-image>
+            </a-entity>
+
+            <a-entity id="group-classroom" scale="0 0 0">
+              <a-image spot="linkto:#linktoclassroom;spotgroup:group-linktoclassroom" position="5.3 0.5 8"></a-image>
+            </a-entity>
+
+            <a-entity id="group-lastpic" scale="0 0 0">
+              <a-image spot="linkto:#linktoclassroom;spotgroup:group-linktoclassroom" position="-10 0 -1"></a-image>
+              <a-image spot="linkto:#pic2;spotgroup:group-pic2" position="10 0 -1"></a-image>
+            </a-entity>
+
+
+          </a-entity>
+      </a-entity>
+
+      <a-sky id="skybox" src="#pic1"  ></a-sky>
+
+      <!-- Camera + cursor. -->
+      <a-entity id="cam" camera position="0 1.6 0" look-controls >
+        <a-entity cursor="fuse:true;fuseTimeout:1000"
+                  geometry="primitive:ring;radiusInner:0.01;radiusOuter:0.02"
+                  position="0 0 -1.8"
+                  material="shader:flat;color:#ff0000"
+                  animation__mouseenter="property:scale;to:3 3 3;startEvents:mouseenter;endEvents:mouseleave;dir:reverse;dur:2000;loop:1">
+        </a-entity>
+</a-entity>
+    </a-scene>
+  </body>
+</html>
